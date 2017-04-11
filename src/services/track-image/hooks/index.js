@@ -3,6 +3,7 @@
 const globalHooks = require('../../../hooks');
 const hooks = require('feathers-hooks');
 const auth = require('feathers-authentication').hooks;
+const dauria = require('dauria');
 
 exports.before = {
   all: [
@@ -12,7 +13,15 @@ exports.before = {
   ],
   find: [],
   get: [],
-  create: [],
+  create: [
+    function (hook) {
+      if (!hook.data.uri && hook.params.file) {
+        const file = hook.params.file;
+        const uri = dauria.getBase64DataURI(file.buffer, file.mimetype);
+        hook.data = {uri: uri};
+      }
+    }
+  ],
   update: [],
   patch: [],
   remove: []
